@@ -1,0 +1,21 @@
+services:
+  postgres:
+    image: postgres:latest
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=enigma_db
+    command: ["postgres", "-c", "log_statement=all"]
+  redis:
+    image: redis:latest
+  app:
+    build: .
+    environment:
+      - DATABASE_URL=postgres://postgres:postgres@postgres/enigma_db
+      - ROCKET_DATABASES={postgres={url=postgres://postgres:postgres@postgres/enigma_db}}
+      - ROCKET_ADDRESS=0.0.0.0
+      - ROCKET_PORT=8080
+    ports:
+      - 8080:8080
+    volumes:
+      - ./:/app/
