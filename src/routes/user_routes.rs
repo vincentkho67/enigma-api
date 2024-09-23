@@ -1,6 +1,11 @@
 use rocket_db_pools::Connection;
-use rocket::{http::Status, response::status::{Custom, NoContent}, serde::json::{json, Json, Value}};
-use crate::{model::user::{NewUser, UpdateUser}, repository::user_repository::UserRepository, DbConn};
+use rocket::{routes, Route,http::Status, response::status::{Custom, NoContent}, serde::json::{json, Json, Value}};
+use crate::{model::user::{NewUser, UpdateUser}, repository::user_repository::UserRepository};
+use crate::routes::DbConn;
+
+pub fn routes() -> Vec<Route> {
+    routes![get_all, get_one, create, update, delete]
+}
 
 #[rocket::get("/users")]
 pub async fn get_all(mut db: Connection<DbConn>) -> Result<Value, Custom<Value>>{
