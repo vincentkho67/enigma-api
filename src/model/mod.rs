@@ -1,4 +1,4 @@
 pub mod user;
-mod course;
+pub mod course;
 mod users_courses;
 mod attendance;
