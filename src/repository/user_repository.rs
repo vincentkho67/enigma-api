@@ -11,14 +11,7 @@ impl UserRepository {
     pub async fn show(c: &mut AsyncPgConnection, id: i32) -> QueryResult<User> {
         users::table.find(id).get_result(c).await
     }
-    pub async fn create(c: &mut AsyncPgConnection, mut user: NewUser) -> QueryResult<User> {
-        user.role = Some(String::from("STUDENT"));
-        if !validate_role(&user.role) {
-            return Err(diesel::result::Error::DatabaseError(
-                diesel::result::DatabaseErrorKind::Unknown,
-                Box::new(String::from("Invalid role!"))
-            ));
-        }
+    pub async fn create(c: &mut AsyncPgConnection, user: NewUser) -> QueryResult<User> {
         diesel::insert_into(users::table)
             .values(user)
             .get_result(c)
@@ -32,12 +25,5 @@ impl UserRepository {
     }
     pub async fn delete(c: &mut AsyncPgConnection, id: i32) -> QueryResult<usize> {
         diesel::delete(users::table.find(id)).execute(c).await
-    }
-}
-
-fn validate_role(role: &Option<String>) -> bool {
-    match role {
-        Some(r) => User::is_valid_role(r),
-        None => false
     }
 }
