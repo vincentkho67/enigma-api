@@ -1,14 +1,29 @@
 CREATE TABLE users (
     id SERIAL PRIMARY KEY,
-    first_name VARCHAR(64) NOT NULL,
-    last_name VARCHAR(64) NOT NULL,
-    email VARCHAR(64) NOT NULL,
-    password VARCHAR(64) NOT NULL,
+    first_name VARCHAR(64),
+    last_name VARCHAR(64),
+    email VARCHAR(64) NOT NULL UNIQUE,
+    password VARCHAR(128) NOT NULL,
     phone_number VARCHAR(64),
     oauth_provider VARCHAR(64),
     oauth_id VARCHAR(64),
     profile_picture_url VARCHAR(64),
-    role VARCHAR(16) NOT NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMP NOT NULL DEFAULT NOW()
+);
+
+CREATE TABLE roles (
+    id SERIAL PRIMARY KEY,
+    code varchar(64) UNIQUE NOT NULL,
+    name varchar(128) UNIQUE NOT NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMP NOT NULL DEFAULT NOW()
+);
+
+CREATE TABLE users_roles (
+    id SERIAL PRIMARY KEY,
+    user_id INT NOT NULL REFERENCES users(id),
+    role_id INT NOT NULL REFERENCES roles(id),
     created_at TIMESTAMP NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMP NOT NULL DEFAULT NOW()
 );

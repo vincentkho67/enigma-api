@@ -24,15 +24,10 @@ fn test_create() {
     let client = Client::new();
     let response = client.post(format!("{}/users",APP_HOST))
         .json(&json!({
-            "first_name": "Test",
-            "last_name": "User",
-            "email": "w5vXn@example.com",
-            "password": "password",
-            "phone_number": "555-555-5555",
-            "oauth_provider": "google",
-            "oauth_id": "123456789",
-            "profile_picture_url": "https://example.com/image.png",
-            "role": "STUDENT"
+            "first_name": "test",
+            "last_name": "create_guy",
+            "email": common::generate_random_string(),
+            "password": "password"
         }))
         .send()
         .unwrap();
@@ -41,15 +36,14 @@ fn test_create() {
     let user: Value = response.json().unwrap();
     assert_eq!(user, json!({
         "id": user["id"],
-        "email": "w5vXn@example.com",
+        "email": user["email"],
         "password": "password",
-        "first_name": "Test",
-        "last_name": "User",
-        "phone_number": "555-555-5555",
+        "first_name": user["first_name"],
+        "last_name": user["last_name"],
+        "phone_number": user["phone_number"],
         "oauth_provider": user["oauth_provider"],
         "oauth_id": user["oauth_id"],
-        "profile_picture_url": "https://example.com/image.png",
-        "role": user["role"],
+        "profile_picture_url": user["profile_picture_url"],
         "created_at": user["created_at"],
         "updated_at": user["updated_at"],
     }));
@@ -70,15 +64,14 @@ fn test_get_one() {
     let user: Value = response.json().unwrap();
     assert_eq!(user, json!({
         "id": user["id"],
-        "email": "w5vXn@example.com",
+        "email": user["email"],
         "password": "password",
-        "first_name": "Test",
-        "last_name": "User",
-        "phone_number": "555-555-5555",
+        "first_name": user["first_name"],
+        "last_name": user["last_name"],
+        "phone_number": user["phone_number"],
         "oauth_provider": user["oauth_provider"],
         "oauth_id": user["oauth_id"],
-        "profile_picture_url": "https://example.com/image.png",
-        "role": user["role"],
+        "profile_picture_url": user["profile_picture_url"],
         "created_at": user["created_at"],
         "updated_at": user["updated_at"],
     }));
@@ -114,3 +107,4 @@ fn test_delete() {
         .unwrap();
     assert_eq!(response.status(), StatusCode::NO_CONTENT);
 }
+

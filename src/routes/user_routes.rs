@@ -1,6 +1,6 @@
 use rocket_db_pools::Connection;
 use rocket::{http::Status, response::status::{Custom, NoContent}, routes, serde::json::{json, Json, Value}, Route};
-use crate::{model::user::{NewUser, UpdateUser}, repository::user_repository::UserRepository};
+use crate::{model::user::{NewUserAPI, UpdateUser}, repository::user_repository::UserRepository};
 use crate::routes::{DbConn, server_error};
 
 pub fn routes() -> Vec<Route> {
@@ -22,7 +22,7 @@ pub async fn get_one(mut db: Connection<DbConn>, id: i32) -> Result<Value, Custo
 }
 
 #[rocket::post("/users", format="json", data="<params>")]
-pub async fn create(mut db: Connection<DbConn>, params: Json<NewUser>) -> Result<Custom<Value>, Custom<Value>>{
+pub async fn create(mut db: Connection<DbConn>, params: Json<NewUserAPI>) -> Result<Custom<Value>, Custom<Value>>{
     UserRepository::create(&mut db, params.into_inner()).await
         .map(|u| Custom(Status::Created, json!(u)))
         .map_err(|e| server_error(e.into()))

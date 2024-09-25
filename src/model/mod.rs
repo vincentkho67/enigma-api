@@ -1,4 +1,6 @@
 pub mod user;
 pub mod course;
-mod users_courses;
-mod attendance;
+pub mod role;
+pub mod users_roles;
+pub mod users_courses;
+pub mod attendance;

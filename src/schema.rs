@@ -30,15 +30,27 @@ diesel::table! {
 }
 
 diesel::table! {
+    roles (id) {
+        id -> Int4,
+        #[max_length = 64]
+        code -> Varchar,
+        #[max_length = 128]
+        name -> Varchar,
+        created_at -> Timestamp,
+        updated_at -> Timestamp,
+    }
+}
+
+diesel::table! {
     users (id) {
         id -> Int4,
         #[max_length = 64]
-        first_name -> Varchar,
+        first_name -> Nullable<Varchar>,
         #[max_length = 64]
-        last_name -> Varchar,
+        last_name -> Nullable<Varchar>,
         #[max_length = 64]
         email -> Varchar,
-        #[max_length = 64]
+        #[max_length = 128]
         password -> Varchar,
         #[max_length = 64]
         phone_number -> Nullable<Varchar>,
@@ -48,8 +60,6 @@ diesel::table! {
         oauth_id -> Nullable<Varchar>,
         #[max_length = 64]
         profile_picture_url -> Nullable<Varchar>,
-        #[max_length = 16]
-        role -> Varchar,
         created_at -> Timestamp,
         updated_at -> Timestamp,
     }
@@ -66,13 +76,27 @@ diesel::table! {
     }
 }
 
+diesel::table! {
+    users_roles (id) {
+        id -> Int4,
+        user_id -> Int4,
+        role_id -> Int4,
+        created_at -> Timestamp,
+        updated_at -> Timestamp,
+    }
+}
+
 diesel::joinable!(attendance -> users_courses (user_course_id));
 diesel::joinable!(users_courses -> courses (course_id));
 diesel::joinable!(users_courses -> users (user_id));
+diesel::joinable!(users_roles -> roles (role_id));
+diesel::joinable!(users_roles -> users (user_id));
 
 diesel::allow_tables_to_appear_in_same_query!(
     attendance,
     courses,
+    roles,
     users,
     users_courses,
+    users_roles,
 );

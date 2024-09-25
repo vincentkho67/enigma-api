@@ -1,21 +1,30 @@
 use reqwest::{blocking::Client, StatusCode};
 use serde_json::{json, Value};
+use rand::{Rng, distributions::{Distribution, Uniform}};
 
 pub static APP_HOST: &'static str = "http://localhost:8080/api";
+// Helper
+pub fn generate_random_string() -> String {
+    let alphabet: &[u8] = b"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    let mut rng = rand::thread_rng();
+    let mut result = String::with_capacity(10);
+
+    for _ in 0..10 {
+        let idx = rng.gen_range(0..alphabet.len());
+        result.push(alphabet[idx] as char);
+    }
+
+    result
+}
 
 // User Section
 pub fn create_user(client: &Client) -> Value {
     let response = client.post(format!("{}/users",APP_HOST))
     .json(&json!({
-        "first_name": "Test",
-        "last_name": "User",
-        "email": "w5vXn@example.com",
-        "password": "password",
-        "phone_number": "555-555-5555",
-        "oauth_provider": "google",
-        "oauth_id": "123456789",
-        "profile_picture_url": "https://example.com/image.png",
-        "role": "STUDENT"
+        "first_name": "test",
+        "last_name": "helloew",
+        "email": generate_random_string(),
+        "password": "password"
     }))
     .send()
     .unwrap();
