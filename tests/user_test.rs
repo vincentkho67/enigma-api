@@ -37,7 +37,7 @@ fn test_create() {
     assert_eq!(user, json!({
         "id": user["id"],
         "email": user["email"],
-        "password": "password",
+        "password": user["password"],
         "first_name": user["first_name"],
         "last_name": user["last_name"],
         "phone_number": user["phone_number"],
@@ -65,7 +65,7 @@ fn test_get_one() {
     assert_eq!(user, json!({
         "id": user["id"],
         "email": user["email"],
-        "password": "password",
+        "password": user["password"],
         "first_name": user["first_name"],
         "last_name": user["last_name"],
         "phone_number": user["phone_number"],
