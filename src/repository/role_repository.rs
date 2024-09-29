@@ -4,14 +4,14 @@ use crate::{model::{role::{NewRole, Role}, user::User, users_roles::{NewUserRole
 pub struct RoleRepository;
 
 impl RoleRepository {
-    pub async fn index(c: &mut AsyncPgConnection, limit: i64) -> QueryResult<Vec<Role>>{
+    pub async fn _index(c: &mut AsyncPgConnection, limit: i64) -> QueryResult<Vec<Role>>{
         roles::table.limit(limit).get_results(c).await
     }
 
     pub async fn index_by_ids(c: &mut AsyncPgConnection, ids: Vec<i32>) -> QueryResult<Vec<Role>> {
         roles::table.filter(roles::id.eq_any(ids)).load(c).await
     }
-    pub async fn show(c: &mut AsyncPgConnection, id: i32) -> QueryResult<Role> {
+    pub async fn _show(c: &mut AsyncPgConnection, id: i32) -> QueryResult<Role> {
         roles::table.find(id).get_result(c).await
     }
 
@@ -34,7 +34,7 @@ impl RoleRepository {
             .await
     }
 
-    pub async fn delete(c: &mut AsyncPgConnection, id: i32) -> QueryResult<usize> {
+    pub async fn _delete(c: &mut AsyncPgConnection, id: i32) -> QueryResult<usize> {
         diesel::delete(roles::table.find(id)).execute(c).await
     }
 }

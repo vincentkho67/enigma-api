@@ -4,11 +4,11 @@ use crate::schema::attendance;
 
 #[derive(Queryable)]
 pub struct Attendance {
-    pub id: i32,
-    pub user_course_id: i32,
-    pub date: NaiveDateTime,
-    pub status: String,
-    pub notes: Option<String>,
+    pub _id: i32,
+    pub _user_course_id: i32,
+    pub _date: NaiveDateTime,
+    pub _status: String,
+    pub _notes: Option<String>,
 }
 
 #[derive(Insertable)]
