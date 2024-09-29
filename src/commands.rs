@@ -35,7 +35,7 @@ pub async fn index_users() {
     }
 }
 
-pub async fn delete_user(id: i32) {
+pub async fn delete_user(_id: i32) {
     let mut _c = load_db_connection().await;
 
 }
@@ -58,7 +58,7 @@ pub async fn index_roles() {
 
 }
 
-pub async fn delete_role(id: i32) {
+pub async fn delete_role(_id: i32) {
     let mut _c = load_db_connection().await;
 
 }

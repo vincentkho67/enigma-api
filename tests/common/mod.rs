@@ -1,6 +1,6 @@
 use reqwest::{blocking::Client, StatusCode};
 use serde_json::{json, Value};
-use rand::{Rng, distributions::{Distribution, Uniform}};
+use rand::Rng;
 
 pub static APP_HOST: &'static str = "http://localhost:8080/api";
 // Helper
