@@ -6,7 +6,8 @@ use rocket_db_pools::Database;
 async fn main() {
     let _ = rocket::build()
         .mount("/api", enigma_api::routes::routes())
-        .attach(enigma_api::routes::DbConn::init())
+        .attach(enigma_api::database::db::DbConn::init())
+        .attach(enigma_api::database::db::CacheConn::init())
         .launch()
         .await;
 }

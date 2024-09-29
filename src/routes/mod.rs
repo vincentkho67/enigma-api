@@ -1,18 +1,16 @@
-use rocket_db_pools::Database;
 use rocket::{Route, http::Status, response::status::Custom, serde::json::{json, Value}};
 use std::error::Error;
+use crate::database::db::DbConn;
 
-pub mod user_routes;
-pub mod course_routes;
-
-#[derive(Database)]
-#[database("postgres")]
-pub struct DbConn(rocket_db_pools::diesel::PgPool);
+pub mod authorization_route;
+pub mod user_route;
+pub mod course_route;
 
 pub fn routes() -> Vec<Route> {
     let mut routes = vec![];
-    routes.extend(user_routes::routes());
-    routes.extend(course_routes::routes());
+    routes.extend(authorization_route::routes());
+    routes.extend(user_route::routes());
+    routes.extend(course_route::routes());
 
     routes
 }

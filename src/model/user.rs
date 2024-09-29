@@ -46,3 +46,9 @@ pub struct UpdateUser {
     pub phone_number: Option<String>,
     pub profile_picture_url: Option<String>,
 }
+
+#[derive(Deserialize)]
+pub struct Credential {
+    pub email: String,
+    pub password: String,
+}

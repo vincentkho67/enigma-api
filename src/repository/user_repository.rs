@@ -1,7 +1,6 @@
-use argon2::password_hash::{SaltString, rand_core::OsRng, PasswordHasher};
-use diesel::{GroupedBy, QueryDsl, QueryResult};
+use diesel::{ExpressionMethods, GroupedBy, QueryDsl, QueryResult};
 use diesel_async::{AsyncPgConnection, RunQueryDsl};
-use crate::{model::{role::Role, user::{NewUserAPI, NewUserCLI, UpdateUser, User}, users_roles::{NewUserRole, UserRole}}, schema::{roles, users, users_roles}};
+use crate::{middleware::authorization::hash_password, model::{role::Role, user::{NewUserAPI, NewUserCLI, UpdateUser, User}, users_roles::{NewUserRole, UserRole}}, schema::{roles, users, users_roles}};
 
 use super::role_repository::{RoleRepository, UserRoleRepository};
 
@@ -26,8 +25,12 @@ impl UserRepository {
         users::table.find(id).get_result(c).await
     }
 
+    pub async fn show_by_email(c: &mut AsyncPgConnection, email: &String) -> QueryResult<User> {
+        users::table.filter(users::email.eq(email)).get_result(c).await
+    }
+
     pub async fn create(c: &mut AsyncPgConnection, mut user: NewUserAPI) -> QueryResult<User> {
-        user.password = hash_password(user.password);
+        user.password = hash_password(user.password).unwrap();
         diesel::insert_into(users::table)
             .values(user)
             .get_result(c)
@@ -35,7 +38,7 @@ impl UserRepository {
     }
 
     pub async fn create_with_cli(c: &mut AsyncPgConnection, mut user: NewUserCLI, role_codes: Vec<String>) -> QueryResult<User> {
-        user.password = hash_password(user.password);
+        user.password = hash_password(user.password).unwrap();
         let user: User = diesel::insert_into(users::table)
             .values(user)
             .get_result(c)
@@ -65,11 +68,4 @@ impl UserRepository {
     pub async fn delete(c: &mut AsyncPgConnection, id: i32) -> QueryResult<usize> {
         diesel::delete(users::table.find(id)).execute(c).await
     }
-}
-
-fn hash_password(password: String) -> String {
-    let salt = SaltString::generate(OsRng);
-    let argon2 = argon2::Argon2::default();
-    
-    argon2.hash_password(password.as_bytes(), &salt).unwrap().to_string()
 }
