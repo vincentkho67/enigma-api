@@ -69,31 +69,32 @@ impl<'r> FromRequest<'r> for User {
 }
 
 pub struct AdminUser(User);
+
 #[rocket::async_trait]
 impl<'r> FromRequest<'r> for AdminUser {
     type Error = ();
-
     async fn from_request(req: &'r Request<'_>) -> Outcome<Self, Self::Error> {
-        let user = req.guard::<User>().await
-            .expect("Cannot retrieve current logged in user");
-        let mut db = req.guard::<Connection<DbConn>>().await
-                .expect("Can not connect to postgres in request guard");
-
-        if let Ok(roles) = RoleRepository::show_by_user(&mut db, &user).await {
-            let is_admin = roles.iter().any(|v| match v.code {
-                RoleCode::Admin => true,
-                RoleCode::Trainer => true,
-                _ => false
-            });
-
-            if is_admin {
-                return Outcome::Success(AdminUser(user));
-            }
+        match req.guard::<User>().await {
+            Outcome::Success(user) => {
+                let mut db = req.guard::<Connection<DbConn>>().await
+                    .expect("Can not connect to postgres in request guard");
+                if let Ok(roles) = RoleRepository::show_by_user(&mut db, &user).await {
+                    let is_admin = roles.iter().any(|v| match v.code {
+                        RoleCode::Admin => true,
+                        RoleCode::Trainer => true,
+                        _ => false
+                    });
+                    if is_admin {
+                        return Outcome::Success(AdminUser(user));
+                    }
+                }
+                Outcome::Error((Status::Unauthorized, ()))
+            },
+            _ => Outcome::Error((Status::Unauthorized, ()))
         }
-
-        Outcome::Error((Status::Unauthorized, ()))
     }
 }
+
 
 pub fn server_error(e: Box<dyn Error>) -> Custom<Value>{
     rocket::error!("{}", e);

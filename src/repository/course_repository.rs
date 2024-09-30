@@ -1,6 +1,7 @@
+use argon2::Params;
 use diesel::{QueryDsl, QueryResult};
 use diesel_async::{AsyncPgConnection, RunQueryDsl};
-use crate::{model::course::{NewCourse, UpdateCourse, Course}, schema::courses};
+use crate::{model::{course::{Course, NewCourse, UpdateCourse}, user::UserIds, users_courses::{NewUserCourse, UserCourse}}, schema::{courses, users_courses}};
 
 pub struct CourseRepository;
 
@@ -20,6 +21,19 @@ impl CourseRepository {
             .get_result(c)
             .await
     }
+    pub async fn assign_student(c: &mut AsyncPgConnection, course_id: i32, user_ids: UserIds) -> Result<String, Box<dyn std::error::Error>> {
+        for user_id in user_ids.user_ids {
+            UserCourseRepository::create(
+                c,
+                NewUserCourse {
+                    user_id,
+                    course_id,
+                    total_attendance: 0
+                }
+            ).await?;
+        }
+        Ok(String::from("Success!"))
+    }
     pub async fn update(c: &mut AsyncPgConnection, id: i32, params: UpdateCourse) -> QueryResult<Course> {
         diesel::update(courses::table.find(id))
             .set(params)
@@ -28,5 +42,16 @@ impl CourseRepository {
     }
     pub async fn delete(c: &mut AsyncPgConnection, id: i32) -> QueryResult<usize> {
         diesel::delete(courses::table.find(id)).execute(c).await
+    }
+}
+
+pub struct UserCourseRepository;
+
+impl UserCourseRepository {
+    pub async fn create(c: &mut AsyncPgConnection, params: NewUserCourse) -> QueryResult<UserCourse> {
+        diesel::insert_into(users_courses::table)
+            .values(params)
+            .get_result(c)
+            .await
     }
 }

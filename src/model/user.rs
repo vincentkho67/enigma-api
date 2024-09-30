@@ -53,3 +53,8 @@ pub struct Credential {
     pub email: String,
     pub password: String,
 }
+
+#[derive(Deserialize)]
+pub struct UserIds {
+    pub user_ids: Vec<i32>,
+}
