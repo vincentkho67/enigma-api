@@ -1,6 +1,6 @@
 use rocket_db_pools::Connection;
 use rocket::{http::Status, response::status::{Custom, NoContent}, routes, serde::json::{json, Json, Value}, Route};
-use crate::{model::{course::{NewCourse, UpdateCourse}, user::User}, repository::course_repository::CourseRepository};
+use crate::{model::course::{NewCourse, UpdateCourse}, repository::course_repository::CourseRepository};
 use crate::routes::{DbConn, server_error};
 
 use super::AdminUser;
