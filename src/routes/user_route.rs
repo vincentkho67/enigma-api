@@ -3,6 +3,8 @@ use rocket::{http::Status, response::status::{Custom, NoContent}, routes, serde:
 use crate::{model::user::{NewUserAPI, UpdateUser}, repository::user_repository::UserRepository};
 use crate::routes::{DbConn, server_error};
 
+use super::AdminUser;
+
 pub fn routes() -> Vec<Route> {
     routes![get_all, get_one, create, update, delete]
 }
@@ -36,7 +38,7 @@ pub async fn update(mut db: Connection<DbConn>, id: i32, params: Json<UpdateUser
 }
 
 #[rocket::delete("/users/<id>",)]
-pub async fn delete(mut db: Connection<DbConn>, id: i32) -> Result<NoContent, Custom<Value>>{
+pub async fn delete(mut db: Connection<DbConn>, id: i32, _user: AdminUser) -> Result<NoContent, Custom<Value>>{
     UserRepository::delete(&mut db, id).await
         .map(|_| NoContent)
         .map_err(|e| server_error(e.into()))

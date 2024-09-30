@@ -9,6 +9,7 @@ pub struct User {
     pub first_name: Option<String>,
     pub last_name: Option<String>,
     pub email: String,
+    #[serde(skip_serializing)]
     pub password: String,
     pub phone_number: Option<String>,
     pub oauth_provider: Option<String>,

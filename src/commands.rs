@@ -1,6 +1,8 @@
+use std::str::FromStr;
+
 use diesel_async::{AsyncConnection, AsyncPgConnection};
 
-use crate::{model::{role::NewRole, user::NewUserCLI}, repository::{role_repository::RoleRepository, user_repository::UserRepository}};
+use crate::{model::{role::{NewRole, RoleCode}, user::NewUserCLI}, repository::{role_repository::RoleRepository, user_repository::UserRepository}};
 
 async fn load_db_connection() -> AsyncPgConnection{
     let database_url = std::env::var("DATABASE_URL")
@@ -18,8 +20,8 @@ pub async fn create_user(email: String, password: String, role_codes: Vec<String
         email,
         password
     };
-
-    let user = UserRepository::create_with_cli(&mut c, new_user, role_codes).await.unwrap();
+    let role_enums = role_codes.iter().map(|v| RoleCode::from_str(v.as_str()).unwrap()).collect();
+    let user = UserRepository::create_with_cli(&mut c, new_user, role_enums).await.unwrap();
     println!("Created user: {:?}", user);
 
     let roles = RoleRepository::show_by_user(&mut c, &user).await.unwrap();
@@ -45,7 +47,7 @@ pub async fn create_role(code: String, name: String) {
     let mut c = load_db_connection().await;
 
     let new_role = NewRole {
-        code,
+        code : RoleCode::from_str(&code).unwrap(),
         name
     };
 

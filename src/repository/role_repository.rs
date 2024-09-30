@@ -1,6 +1,6 @@
 use diesel::{ExpressionMethods, QueryDsl, QueryResult, BelongingToDsl};
 use diesel_async::{AsyncPgConnection, RunQueryDsl};
-use crate::{model::{role::{NewRole, Role}, user::User, users_roles::{NewUserRole, UserRole}}, schema::{roles, users_roles}};
+use crate::{model::{role::{NewRole, Role, RoleCode}, user::User, users_roles::{NewUserRole, UserRole}}, schema::{roles, users_roles}};
 pub struct RoleRepository;
 
 impl RoleRepository {
@@ -15,7 +15,7 @@ impl RoleRepository {
         roles::table.find(id).get_result(c).await
     }
 
-    pub async fn show_by_code(c: &mut AsyncPgConnection, role_code: String) -> QueryResult<Role> {
+    pub async fn show_by_code(c: &mut AsyncPgConnection, role_code: &RoleCode) -> QueryResult<Role> {
         roles::table.filter(roles::code.eq(role_code)).first(c).await
     }
     

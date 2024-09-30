@@ -1,6 +1,6 @@
 use diesel::{ExpressionMethods, GroupedBy, QueryDsl, QueryResult};
 use diesel_async::{AsyncPgConnection, RunQueryDsl};
-use crate::{middleware::authorization::hash_password, model::{role::Role, user::{NewUserAPI, NewUserCLI, UpdateUser, User}, users_roles::{NewUserRole, UserRole}}, schema::{roles, users, users_roles}};
+use crate::{middleware::authorization::hash_password, model::{role::{Role, RoleCode}, user::{NewUserAPI, NewUserCLI, UpdateUser, User}, users_roles::{NewUserRole, UserRole}}, schema::{roles, users, users_roles}};
 
 use super::role_repository::{RoleRepository, UserRoleRepository};
 
@@ -37,7 +37,7 @@ impl UserRepository {
             .await
     }
 
-    pub async fn create_with_cli(c: &mut AsyncPgConnection, mut user: NewUserCLI, role_codes: Vec<String>) -> QueryResult<User> {
+    pub async fn create_with_cli(c: &mut AsyncPgConnection, mut user: NewUserCLI, role_codes: Vec<RoleCode>) -> QueryResult<User> {
         user.password = hash_password(user.password).unwrap();
         let user: User = diesel::insert_into(users::table)
             .values(user)
@@ -45,7 +45,7 @@ impl UserRepository {
             .await?;
 
         for role_code in role_codes {
-            match RoleRepository::show_by_code(c, role_code.to_owned()).await {
+            match RoleRepository::show_by_code(c, &role_code).await {
                 Ok(role) => {
                     let new_user_role = NewUserRole { user_id: user.id, role_id: role.id };
                     UserRoleRepository::create(c, new_user_role).await?;
