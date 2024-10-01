@@ -23,3 +23,9 @@ pub struct NewUserCourse {
     pub course_id: i32,
     pub total_attendance: i32,
 }
+
+#[derive(AsChangeset, Insertable, Deserialize)]
+#[diesel(table_name = users_courses)]
+pub struct UpdateUserCourse {
+    pub total_attendance: i32,
+}

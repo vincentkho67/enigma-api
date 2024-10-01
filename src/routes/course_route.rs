@@ -1,12 +1,12 @@
 use rocket_db_pools::Connection;
 use rocket::{http::Status, response::status::{Custom, NoContent}, routes, serde::json::{json, Json, Value}, Route};
-use crate::{model::{course::{NewCourse, UpdateCourse}, user::UserIds}, repository::course_repository::CourseRepository};
+use crate::{model::{course::{NewCourse, UpdateCourse}, user::{User, UserIds}}, repository::course_repository::{CourseRepository, UserCourseRepository}};
 use crate::routes::{DbConn, server_error};
 
 use super::AdminUser;
 
 pub fn routes() -> Vec<Route> {
-    routes![get_all, get_one, create, update, delete, assign_student]
+    routes![get_all, get_one, create, update, delete, assign_student, get_user_course]
 }
 
 #[rocket::get("/courses")]
@@ -50,9 +50,16 @@ pub async fn update(mut db: Connection<DbConn>, id: i32, params: Json<UpdateCour
         .map_err(|e| server_error(e.into()))
 }
 
-#[rocket::delete("/courses/<id>",)]
+#[rocket::delete("/courses/<id>")]
 pub async fn delete(mut db: Connection<DbConn>, id: i32, _user: AdminUser) -> Result<NoContent, Custom<Value>>{
     CourseRepository::delete(&mut db, id).await
         .map(|_| NoContent)
+        .map_err(|e| server_error(e.into()))
+}
+
+#[rocket::get("/courses/user-course/<id>")]
+pub async fn get_user_course(mut db: Connection<DbConn>, id: i32, _user: User) -> Result<Custom<Value>, Custom<Value>> {
+    UserCourseRepository::show_by_user(&mut db, id).await
+        .map(|u| Custom(Status::Ok, json!(u)))
         .map_err(|e| server_error(e.into()))
 }

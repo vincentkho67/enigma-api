@@ -6,6 +6,7 @@ use rocket_db_pools::{deadpool_redis::redis::AsyncCommands, Connection};
 pub mod authorization_route;
 pub mod user_route;
 pub mod course_route;
+pub mod attendance_route;
 
 pub fn routes() -> Vec<Route> {
     let mut routes = vec![];
@@ -13,6 +14,7 @@ pub fn routes() -> Vec<Route> {
     routes.extend(authorization_route::routes());
     routes.extend(user_route::routes());
     routes.extend(course_route::routes());
+    routes.extend(attendance_route::routes());
 
     routes
 }
