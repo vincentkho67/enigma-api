@@ -1,6 +1,6 @@
 use diesel::{QueryDsl, QueryResult};
 use diesel_async::{AsyncPgConnection, RunQueryDsl};
-use crate::{model::{course::{Course, NewCourse, UpdateCourse}, user::UserIds, users_courses::{NewUserCourse, UpdateUserCourse, UserCourse}}, schema::{attendance::user_course_id, courses, users_courses::{self, total_attendance}}};
+use crate::{model::{course::{Course, NewCourse, UpdateCourse}, user::UserIds, users_courses::{NewUserCourse, UpdateUserCourse, UserCourse}}, schema::{courses, users_courses}};
 use chrono::prelude::*;
 use diesel::ExpressionMethods;
 

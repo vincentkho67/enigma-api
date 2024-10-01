@@ -1,6 +1,6 @@
 use diesel::{ExpressionMethods, QueryResult};
 use diesel_async::{AsyncPgConnection, RunQueryDsl};
-use crate::{model::{attendance::{Attendance, NewAttendance}, users_courses::{UpdateUserCourse, UserCourse}}, schema::{attendance, users_courses::total_attendance}};
+use crate::{model::{attendance::{Attendance, NewAttendance}, users_courses::{UpdateUserCourse, UserCourse}}, schema::attendance};
 use diesel::QueryDsl;
 
 use super::course_repository::UserCourseRepository;
