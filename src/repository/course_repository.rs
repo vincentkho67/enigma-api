@@ -1,4 +1,3 @@
-use argon2::Params;
 use diesel::{QueryDsl, QueryResult};
 use diesel_async::{AsyncPgConnection, RunQueryDsl};
 use crate::{model::{course::{Course, NewCourse, UpdateCourse}, user::UserIds, users_courses::{NewUserCourse, UserCourse}}, schema::{courses, users_courses}};

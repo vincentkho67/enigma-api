@@ -2,7 +2,6 @@ use chrono::NaiveDateTime;
 use diesel::prelude::*;
 use serde::{Deserialize, Serialize};
 use crate::schema::users_courses;
-use crate::model::{course::Course, user::User};
 
 #[derive(Queryable, Serialize, Deserialize, Debug, Identifiable)]
 #[diesel(belongs_to(User))]
