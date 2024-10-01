@@ -1,6 +1,6 @@
 use rocket_db_pools::Connection;
 use rocket::{http::Status, response::status::{Custom, NoContent}, routes, serde::json::{json, Json, Value}, Route};
-use crate::{model::user::{NewUserAPI, UpdateUser}, repository::user_repository::UserRepository};
+use crate::{model::{pagination::PaginationParams, user::{NewUserAPI, UpdateUser}}, repository::user_repository::UserRepository};
 use crate::routes::{DbConn, server_error};
 
 use super::AdminUser;
@@ -9,10 +9,17 @@ pub fn routes() -> Vec<Route> {
     routes![get_all, get_one, create, update, delete]
 }
 
-#[rocket::get("/users")]
-pub async fn get_all(mut db: Connection<DbConn>) -> Result<Value, Custom<Value>>{
-    UserRepository::index(&mut db, 100).await
-        .map(|u| json!(u))
+#[rocket::get("/users?<page>&<per_page>")]
+pub async fn get_all(
+    mut db: Connection<DbConn>,
+    page: Option<i64>,
+    per_page: Option<i64>,
+) -> Result<Json<Value>, Custom<Value>> {
+    let pagination = PaginationParams { page, per_page };
+
+    UserRepository::index(&mut *db, pagination)
+        .await
+        .map(|paginated_response| Json(json!(paginated_response)))
         .map_err(|e| server_error(e.into()))
 }
 

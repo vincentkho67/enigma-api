@@ -1,6 +1,6 @@
 use diesel::{QueryDsl, QueryResult};
 use diesel_async::{AsyncPgConnection, RunQueryDsl};
-use crate::{model::{course::{Course, NewCourse, UpdateCourse}, user::UserIds, users_courses::{NewUserCourse, UpdateUserCourse, UserCourse}}, schema::{courses, users_courses}};
+use crate::{model::{course::{Course, NewCourse, UpdateCourse}, pagination::{PaginatedResponse, PaginationParams}, user::UserIds, users_courses::{NewUserCourse, UpdateUserCourse, UserCourse}}, schema::{courses, users_courses}};
 use chrono::prelude::*;
 use diesel::ExpressionMethods;
 
@@ -8,8 +8,26 @@ use diesel::ExpressionMethods;
 pub struct CourseRepository;
 
 impl CourseRepository {
-    pub async fn index(c: &mut AsyncPgConnection, limit: i64) -> QueryResult<Vec<Course>>{
-        courses::table.limit(limit).get_results(c).await
+    pub async fn index(
+        c: &mut AsyncPgConnection,
+        pagination: PaginationParams
+    ) -> Result<PaginatedResponse<Course>, diesel::result::Error> {
+        let page = pagination.page.unwrap_or(1);
+        let per_page = pagination.per_page.unwrap_or(10);
+        let offset = (page - 1) * per_page;
+
+        let courses = courses::table
+            .offset(offset)
+            .limit(per_page)
+            .load::<Course>(c)
+            .await?;
+
+        let total = courses::table
+            .count()
+            .get_result::<i64>(c)
+            .await?;
+
+        Ok(PaginatedResponse::new(courses, total, page, per_page))
     }
     pub async fn show(c: &mut AsyncPgConnection, id: i32) -> QueryResult<Course> {
         courses::table.find(id).get_result(c).await

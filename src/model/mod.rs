@@ -4,3 +4,4 @@ pub mod role;
 pub mod users_roles;
 pub mod users_courses;
 pub mod attendance;
+pub mod pagination;

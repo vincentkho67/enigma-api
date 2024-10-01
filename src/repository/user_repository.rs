@@ -1,14 +1,32 @@
 use diesel::{ExpressionMethods, GroupedBy, QueryDsl, QueryResult};
 use diesel_async::{AsyncPgConnection, RunQueryDsl};
-use crate::{middleware::authorization::hash_password, model::{role::{Role, RoleCode}, user::{NewUserAPI, NewUserCLI, UpdateUser, User}, users_roles::{NewUserRole, UserRole}}, schema::{roles, users, users_roles}};
+use crate::{middleware::authorization::hash_password, model::{pagination::{PaginatedResponse, PaginationParams}, role::{Role, RoleCode}, user::{NewUserAPI, NewUserCLI, UpdateUser, User}, users_roles::{NewUserRole, UserRole}}, schema::{roles, users, users_roles}};
 
 use super::role_repository::{RoleRepository, UserRoleRepository};
 
 pub struct UserRepository;
 
 impl UserRepository {
-    pub async fn index(c: &mut AsyncPgConnection, limit: i64) -> QueryResult<Vec<User>>{
-        users::table.limit(limit).get_results(c).await
+    pub async fn index(
+        c: &mut AsyncPgConnection,
+        pagination: PaginationParams
+    ) -> Result<PaginatedResponse<User>, diesel::result::Error> {
+        let page = pagination.page.unwrap_or(1);
+        let per_page = pagination.per_page.unwrap_or(10);
+        let offset = (page - 1) * per_page;
+
+        let users = users::table
+            .offset(offset)
+            .limit(per_page)
+            .load::<User>(c)
+            .await?;
+
+        let total = users::table
+            .count()
+            .get_result::<i64>(c)
+            .await?;
+
+        Ok(PaginatedResponse::new(users, total, page, per_page))
     }
 
     pub async fn index_cli(c: &mut AsyncPgConnection) -> QueryResult<Vec<(User, Vec<(UserRole, Role)>)>> {

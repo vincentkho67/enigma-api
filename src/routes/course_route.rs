@@ -1,6 +1,6 @@
 use rocket_db_pools::Connection;
 use rocket::{http::Status, response::status::{Custom, NoContent}, routes, serde::json::{json, Json, Value}, Route};
-use crate::{model::{course::{NewCourse, UpdateCourse}, user::{User, UserIds}}, repository::course_repository::{CourseRepository, UserCourseRepository}};
+use crate::{model::{course::{NewCourse, UpdateCourse}, pagination::PaginationParams, user::{User, UserIds}}, repository::course_repository::{CourseRepository, UserCourseRepository}};
 use crate::routes::{DbConn, server_error};
 
 use super::AdminUser;
@@ -9,10 +9,17 @@ pub fn routes() -> Vec<Route> {
     routes![get_all, get_one, create, update, delete, assign_student, get_user_course]
 }
 
-#[rocket::get("/courses")]
-pub async fn get_all(mut db: Connection<DbConn>) -> Result<Value, Custom<Value>>{
-    CourseRepository::index(&mut db, 100).await
-        .map(|u| json!(u))
+#[rocket::get("/courses?<page>&<per_page>")]
+pub async fn get_all(
+    mut db: Connection<DbConn>,
+    page: Option<i64>,
+    per_page: Option<i64>,
+) -> Result<Json<Value>, Custom<Value>> {
+    let pagination = PaginationParams { page, per_page };
+
+    CourseRepository::index(&mut *db, pagination)
+        .await
+        .map(|paginated_response| Json(json!(paginated_response)))
         .map_err(|e| server_error(e.into()))
 }
 
