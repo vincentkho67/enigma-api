@@ -70,7 +70,7 @@ impl<'r> FromRequest<'r> for User {
     }
 }
 
-pub struct AdminUser(User);
+pub struct AdminUser(#[allow(dead_code)]User);
 
 #[rocket::async_trait]
 impl<'r> FromRequest<'r> for AdminUser {
